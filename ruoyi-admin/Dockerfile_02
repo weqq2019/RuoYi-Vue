@@ -1,0 +1,38 @@
+# 第一阶段：使用 Maven 构建项目
+FROM maven:3.8.6-jdk-11 AS builder
+
+WORKDIR /app
+
+# 复制 pom.xml 并下载依赖（利用 Docker 缓存）
+COPY pom.xml /app/
+COPY ruoyi-common/pom.xml /app/ruoyi-common/
+COPY ruoyi-framework/pom.xml /app/ruoyi-framework/
+COPY ruoyi-generator/pom.xml /app/ruoyi-generator/
+COPY ruoyi-quartz/pom.xml /app/ruoyi-quartz/
+COPY ruoyi-system/pom.xml /app/ruoyi-system/
+COPY ruoyi-admin/pom.xml /app/ruoyi-admin/
+
+RUN mvn -B -f ruoyi-admin/pom.xml dependency:resolve
+
+# 复制所有源码
+COPY ruoyi-common /app/ruoyi-common
+COPY ruoyi-framework /app/ruoyi-framework
+COPY ruoyi-generator /app/ruoyi-generator
+COPY ruoyi-quartz /app/ruoyi-quartz
+COPY ruoyi-system /app/ruoyi-system
+COPY ruoyi-admin /app/ruoyi-admin
+
+# 构建项目，跳过测试以加快速度
+RUN mvn -B -f ruoyi-admin/pom.xml clean package -DskipTests
+
+# 第二阶段：使用精简的 JRE 镜像运行应用程序
+FROM openjdk:11-jre-slim
+
+WORKDIR /app
+
+# 从构建阶段复制生成的 jar 包
+COPY --from=builder /app/ruoyi-admin/target/ruoyi-admin.jar /app/ruoyi-admin.jar
+
+EXPOSE 8080
+
+ENTRYPOINT ["java", "-jar", "/app/ruoyi-admin.jar"]

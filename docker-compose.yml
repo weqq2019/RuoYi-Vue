@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ruoyi
+      MYSQL_USER: ruoyi
+      MYSQL_PASSWORD: ruoyi
+    ports:
+      - "7003:3306"  # MySQL 使用端口 7003
+    networks:
+      - ruoyi-network
+    volumes:
+      - ~/mysql_data:/var/lib/mysql  # 持久化 MySQL 数据
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  redis:
+    image: redis:alpine
+    restart: always
+    ports:
+      - "7004:6379"  # Redis 使用端口 7004
+    networks:
+      - ruoyi-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  ruoyi-admin:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ruoyi?useUnicode=true&characterEncoding=utf8&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: ruoyi
+      SPRING_DATASOURCE_PASSWORD: ruoyi
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    ports:
+      - "7001:8080"  # 后端使用端口 7001
+    networks:
+      - ruoyi-network
+    depends_on:
+      - mysql
+      - redis
+    restart: always
+
+  ruoyi-ui:
+    build:
+      context: .
+      dockerfile: ruoyi-ui/Dockerfile
+    ports:
+      - "7002:80"  # 前端使用端口 7002
+    volumes:
+      - ~/ruoyi-ui:/app:cached
+    networks:
+      - ruoyi-network
+    restart: always
+
+networks:
+  ruoyi-network:
+    driver: bridge

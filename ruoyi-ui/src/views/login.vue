@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
-      <h3 class="title">若依后台管理系统</h3>
+      <h3 class="title">若依后台管理系统22222</h3>
       <el-form-item prop="username">
         <el-input
           v-model="loginForm.username"
@@ -23,7 +23,7 @@
           <svg-icon slot="prefix" icon-class="password" class="el-input__icon input-icon" />
         </el-input>
       </el-form-item>
-      <el-form-item prop="code" v-if="captchaEnabled">
+      <el-form-item v-if="captchaEnabled" prop="code">
         <el-input
           v-model="loginForm.code"
           auto-complete="off"
@@ -34,7 +34,7 @@
           <svg-icon slot="prefix" icon-class="validCode" class="el-input__icon input-icon" />
         </el-input>
         <div class="login-code">
-          <img :src="codeUrl" @click="getCode" class="login-code-img"/>
+          <img :src="codeUrl" class="login-code-img" @click="getCode">
         </div>
       </el-form-item>
       <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
@@ -46,10 +46,10 @@
           style="width:100%;"
           @click.native.prevent="handleLogin"
         >
-          <span v-if="!loading">登 录</span>
+          <span v-if="!loading">登 22录</span>
           <span v-else>登 录 中...</span>
         </el-button>
-        <div style="float: right;" v-if="register">
+        <div v-if="register" style="float: right;">
           <router-link class="link-type" :to="'/register'">立即注册</router-link>
         </div>
       </el-form-item>
@@ -62,97 +62,97 @@
 </template>
 
 <script>
-import { getCodeImg } from "@/api/login";
-import Cookies from "js-cookie";
+import { getCodeImg } from '@/api/login'
+import Cookies from 'js-cookie'
 import { encrypt, decrypt } from '@/utils/jsencrypt'
 
 export default {
-  name: "Login",
+  name: 'Login',
   data() {
     return {
-      codeUrl: "",
+      codeUrl: '',
       loginForm: {
-        username: "admin",
-        password: "admin123",
+        username: 'admin',
+        password: 'admin123',
         rememberMe: false,
-        code: "",
-        uuid: ""
+        code: '',
+        uuid: ''
       },
       loginRules: {
         username: [
-          { required: true, trigger: "blur", message: "请输入您的账号" }
+          { required: true, trigger: 'blur', message: '请输入您的账号' }
         ],
         password: [
-          { required: true, trigger: "blur", message: "请输入您的密码" }
+          { required: true, trigger: 'blur', message: '请输入您的密码' }
         ],
-        code: [{ required: true, trigger: "change", message: "请输入验证码" }]
+        code: [{ required: true, trigger: 'change', message: '请输入验证码' }]
       },
       loading: false,
       // 验证码开关
-      captchaEnabled: true,
+      captchaEnabled: false,
       // 注册开关
       register: false,
       redirect: undefined
-    };
+    }
   },
   watch: {
     $route: {
       handler: function(route) {
-        this.redirect = route.query && route.query.redirect;
+        this.redirect = route.query && route.query.redirect
       },
       immediate: true
     }
   },
   created() {
-    this.getCode();
-    this.getCookie();
+    this.getCode()
+    this.getCookie()
   },
   methods: {
     getCode() {
       getCodeImg().then(res => {
-        this.captchaEnabled = res.captchaEnabled === undefined ? true : res.captchaEnabled;
+        this.captchaEnabled = res.captchaEnabled === undefined ? true : res.captchaEnabled
         if (this.captchaEnabled) {
-          this.codeUrl = "data:image/gif;base64," + res.img;
-          this.loginForm.uuid = res.uuid;
+          this.codeUrl = 'data:image/gif;base64,' + res.img
+          this.loginForm.uuid = res.uuid
         }
-      });
+      })
     },
     getCookie() {
-      const username = Cookies.get("username");
-      const password = Cookies.get("password");
+      const username = Cookies.get('username')
+      const password = Cookies.get('password')
       const rememberMe = Cookies.get('rememberMe')
       this.loginForm = {
         username: username === undefined ? this.loginForm.username : username,
         password: password === undefined ? this.loginForm.password : decrypt(password),
         rememberMe: rememberMe === undefined ? false : Boolean(rememberMe)
-      };
+      }
     },
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.loading = true;
+          this.loading = true
           if (this.loginForm.rememberMe) {
-            Cookies.set("username", this.loginForm.username, { expires: 30 });
-            Cookies.set("password", encrypt(this.loginForm.password), { expires: 30 });
-            Cookies.set('rememberMe', this.loginForm.rememberMe, { expires: 30 });
+            Cookies.set('username', this.loginForm.username, { expires: 30 })
+            Cookies.set('password', encrypt(this.loginForm.password), { expires: 30 })
+            Cookies.set('rememberMe', this.loginForm.rememberMe, { expires: 30 })
           } else {
-            Cookies.remove("username");
-            Cookies.remove("password");
-            Cookies.remove('rememberMe');
+            Cookies.remove('username')
+            Cookies.remove('password')
+            Cookies.remove('rememberMe')
           }
-          this.$store.dispatch("Login", this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || "/" }).catch(()=>{});
+          this.$store.dispatch('Login', this.loginForm).then(() => {
+            this.$router.push({ path: this.redirect || '/' }).catch(() => {})
           }).catch(() => {
-            this.loading = false;
+            this.loading = false
             if (this.captchaEnabled) {
-              this.getCode();
+              this.getCode()
             }
-          });
+          })
         }
-      });
+      })
     }
   }
-};
+}
 </script>
 
 <style rel="stylesheet/scss" lang="scss">

@@ -67,7 +67,7 @@ export const constantRoutes = [
     redirect: 'index',
     children: [
       {
-        path: 'index',
+        path: '',
         component: () => import('@/views/index'),
         name: 'Index',
         meta: { title: '首页', icon: 'dashboard', affix: true }
@@ -165,8 +165,8 @@ export const dynamicRoutes = [
 ]
 
 // 防止连续点击多次路由报错
-let routerPush = Router.prototype.push;
-let routerReplace = Router.prototype.replace;
+const routerPush = Router.prototype.push
+const routerReplace = Router.prototype.replace
 // push
 Router.prototype.push = function push(location) {
   return routerPush.call(this, location).catch(err => err)
