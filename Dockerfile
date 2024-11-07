@@ -1,6 +1,6 @@
 # 使用代理设置
-ARG HTTP_PROXY=http://172.28.243.137:7890
-ARG HTTPS_PROXY=http://172.28.243.137:7890
+ARG HTTP_PROXY=http://127.0.0.1:7890
+ARG HTTPS_PROXY=http://127.0.0.1:7890
 
 # 第一阶段：使用 Maven 构建项目
 FROM maven:3.8.6-jdk-11 AS builder
