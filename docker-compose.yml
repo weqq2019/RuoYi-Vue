@@ -53,17 +53,17 @@ services:
       - redis
     restart: always
 
-  ruoyi-ui:
-    build:
-      context: .
-      dockerfile: ruoyi-ui/Dockerfile
-    ports:
-      - "7002:80"  # 前端使用端口 7002
-    volumes:
-      - ~/ruoyi-ui:/app:cached
-    networks:
-      - ruoyi-network
-    restart: always
+  # ruoyi-ui:
+  #   build:
+  #     context: .
+  #     dockerfile: ruoyi-ui/Dockerfile
+  #   ports:
+  #     - "7002:80"  # 前端使用端口 7002
+  #   volumes:
+  #     - ~/ruoyi-ui:/app:cached
+  #   networks:
+  #     - ruoyi-network
+  #   restart: always
 
 networks:
   ruoyi-network:
